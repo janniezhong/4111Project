@@ -158,13 +158,24 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
-@app.route('/another')
-def another():
-  return render_template("another.html")
-
 @app.route('/fishStuff')
 def fishStuff():
-    return render_template("fishStuff.html")
+
+  #searching for fish names
+  cursor = g.conn.execute("SELECT name FROM fish")
+  names = []
+  for result in cursor:
+    names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
+
+  context = dict(data = names)
+
+
+  return render_template("fishStuff.html", **context)
+
+@app.route('/another')
+def another():
+    return render_template("another.html")
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
