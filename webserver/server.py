@@ -160,15 +160,20 @@ def index():
 #
 @app.route('/fishStuff')
 def fishStuff():
-
+  fssn = 1
   #searching for fish names
-  cursor = g.conn.execute("SELECT name FROM fish")
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
   names = []
   for result in cursor:
     names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
-
-  context = dict(data = names)
+  cursor = g.conn.execute("SELECT fssn FROM fish")
+  fssn = []
+  for result in cursor:
+    fssn.append(result['fssn'])  # can also be accessed using result[0]
+  cursor.close()
+  print(fssn)
+  context = dict(data = names, data2 = fssn)
 
 
   return render_template("fishStuff.html", **context)
@@ -184,7 +189,29 @@ def add():
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
 
+@app.route('/view_fish_profile', methods=['POST'])
+def view_fish_profile():
+  fssn =  request.form['name']
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
+  names = []
+  for result in cursor:
+    names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
 
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, family_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
+  family_names = []
+  for result in cursor:
+    family_names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, predator_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
+  family_names = []
+  for result in cursor:
+    family_names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
+  context = dict(data = names, data2 = family_names)
+
+
+  return render_template("fishStuff.html", **context)
 @app.route('/login')
 def login():
     abort(401)
