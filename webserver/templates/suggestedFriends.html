@@ -15,14 +15,15 @@
     <div>{{n}}</div>
     {% endfor %}
   </div>
-  <div>{{friending_message}}</div>
+ 
 
   <p><a href="index"> Go back to Home</a></p>
 
 <form method="POST" action="/suggested_friends">
 <p>your fssn: <input type="text" name="fssn"> <input type="submit" value="Search"></p>
 </form>
-
+<h1> Add a friend!</h1>
+<div>{{friending_message}}</div>
 <form method="POST" action="/add_friend">
 	<p>Your fssn: <input type="text" name="personal_fssn"></p>
 	<p>Friend fss <input type = "text" name = "friend_fssn"></p> <p> <input type="submit" value="Friend User"></p>

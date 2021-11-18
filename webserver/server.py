@@ -138,7 +138,7 @@ def add_friend():
 
     friend_fssn = request.form['friend_fssn']
     try:
-      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES ('%s', '%s'), ('%s', '%s')", fssn, friend_fssn, friend_fssn, fssn)
+      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES ('%s', '%s'), ('%s', '%s')", int(fssn), int(friend_fssn), int(friend_fssn), int(fssn))
     except: 
       context = dict(friending_message = "Improper message")
       return render_template("suggestedFriends.html", **context)
@@ -351,7 +351,7 @@ def bestOwners():
 def view_best_owners_in_country():
   country = request.form['country']
   try:
-    cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
+    cursor = g.conn.execute("SELECT DISTINCT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
   except:
     return render_template("badInput.html")
   owner_names = []
@@ -389,7 +389,7 @@ def suggestedFriends():
 def view_suggested_friends():
     fssn = request.form['fssn']
     try:
-      cursor = g.conn.execute("SELECT F2.fssn_friend FROM friend_to F1, friend_to F2 WHERE F1.fssn = '" + str(fssn) +"' AND F1.fssn_friend = F2.fssn AND F2.fssn_friend != '" + str(fssn) +"' EXCEPT (SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
+      cursor = g.conn.execute("SELECT DISTINCT F2.fssn_friend FROM friend_to F1, friend_to F2 WHERE F1.fssn = '" + str(fssn) +"' AND F1.fssn_friend = F2.fssn AND F2.fssn_friend != '" + str(fssn) +"' EXCEPT(SELECT F.fssn_friend FROM friend_to F WHERE F.fssn = '" + str(fssn) +"')")
     except:
       return render_template("badInput.html")
     
