@@ -351,7 +351,7 @@ def bestOwners():
 def view_best_owners_in_country():
   country = request.form['country']
   try:
-    cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
+    cursor = g.conn.execute("SELECT DISTINCT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
   except:
     return render_template("badInput.html")
   owner_names = []
