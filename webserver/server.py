@@ -188,13 +188,14 @@ def view_fish_profile():
   cursor.close()
 
   predator_names = []
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
 
   for result in cursor:
 
     predator_names.append(result['name'])  # can also be accessed using result[0]
 
-    cursor.close()
+  cursor.close()
     
 
   
@@ -303,6 +304,10 @@ def view_fish_profile():
 
   return render_template("fishInfo.html", **context)
 
+@app.route('/fishInfo')
+def fishInfo():
+  render_template("fishInfo.html")
+  
 @app.route('/addressDirectory')
 def addressDirectory():
   return render_template("addressDirectory.html")
