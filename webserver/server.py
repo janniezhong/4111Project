@@ -235,7 +235,7 @@ def fishStuff():
 
   print(fssn)
 
-  context = dict(data = names, data2 = fssn)
+  context = dict(friend_data = names, data2 = fssn)
 
 
 
@@ -438,6 +438,11 @@ def view_fish_profile():
 
 
   return render_template("fishStuff.html", **context)
+
+@app.route('/addressDirectory')
+def addressDirectory():
+  return render_template("addressDirectory.html")
+
 @app.route('/address_directory', methods=['POST'])
 def view_fish_directory():
 
@@ -467,11 +472,14 @@ def view_fish_directory():
 
   return render_template("addressDirectory.html", **context)
 
+@app.route('/bestOwners')
+def bestOwners():
+  return render_template("bestOwners.html")
 
 @app.route('/best_owners_in_country', methods=['POST'])
 def view_best_owners_in_country():
   country = request.form['country']
-  cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O1.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
+  cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
   owner_names = []
   for result in cursor:
     owner_names.append(result['name'])  # can also be accessed using result[0]
@@ -479,6 +487,10 @@ def view_best_owners_in_country():
   context = dict(owner_names=owner_names)
 
   return render_template("addressDirectory.html", **context)
+
+@app.route('/tanksInSameAquarium')
+def tanksInSameAquarium():
+  return render_template("tanksinSameAquarium.html")
 
 @app.route('/tanks_in_same_aquarium', methods=['POST'])
 def view_tanks_in_same_aquarium():
@@ -493,6 +505,9 @@ def view_tanks_in_same_aquarium():
 
   return render_template("tanksInSameAquarium.html", **context)
 
+@app.route('/suggestedFriends')
+def suggestedFriends():
+  return render_template("suggestedFriends.html")
 
 @app.route('/suggested_friends', methods=['POST'])
 def view_suggested_friends():
@@ -505,7 +520,6 @@ def view_suggested_friends():
     context = dict(suggested_friends = suggested_friends)
 
     return render_template("suggestedFriends.html", **context)
-
 @app.route('/login')
 
 def login():
@@ -569,4 +583,3 @@ if __name__ == "__main__":
 
 
   run()
-
