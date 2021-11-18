@@ -189,13 +189,27 @@ def add():
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
 
+
+@app.route('/add_friend', methods=['POST'])
+def add_friend():
+    fssn = request.form['personal_fssn']
+    friend_fssn = request.form['friend_fssn']
+    g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
+
 @app.route('/view_fish_profile', methods=['POST'])
 def view_fish_profile():
   fssn =  request.form['name']
-  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
-  names = []
+
+  cursor = g.conn.execute("SELECT f.name FROM fish f WHERE f. fssn='" + str(fssn) + "'")
+  account_name = ''
   for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
+    account_name = result['name']
+  cursor.close()
+
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
+  friend_names = []
+  for result in cursor:
+    friend_names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
 
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, family_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
@@ -203,12 +217,62 @@ def view_fish_profile():
   for result in cursor:
     family_names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
-  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, predator_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
-  family_names = []
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
+  predator_names = []
   for result in cursor:
-    family_names.append(result['name'])  # can also be accessed using result[0]
+    predator_names.append(result['name'])  # can also be accessed using result[0]
+    cursor.close()
+  
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_predator = f1.fssn AND f2.fssn = pt.fssn_prey")
+  prey_names = []
+  for result in cursor:
+    prey_names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
-  context = dict(data = names, data2 = family_names)
+  
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, acquaintance_to acqt WHERE f1.fssn = '" + str(fssn) +"' AND acqt.fssn = f1.fssn AND f2.fssn = acqt.fssn_acquaintance")
+  acquaintance_names = []
+  for result in cursor:
+    acquaintance_names.append(result['name'])
+  cursor.close()
+  
+  cursor = g.conn.execute("SELECT o.name FROM fish f, owner o, belongs_to bt WHERE f.fssn = '" + str(fssn) +"' AND bt.ssn = o.ssn AND f.fssn = bt.fssn")
+  owner_names = []
+  for result in cursor:
+    owner_names.append(result['name'])
+  cursor.close()
+
+
+  cursor = g.conn.execute("SELECT o.type FROM origin o, fish f WHERE f.fssn = '" + str(fssn) +"' AND o.origin_id = f.origin_id")
+  origin_names = []
+  for result in cursor:
+    origin_names.append(result['type'])
+  cursor.close()
+
+
+  cursor = g.conn.execute("SELECT li.tank_id, li.aq_id FROM lives_in li WHERE li.fssn = '" + str(fssn) +"'")
+  tank_name = ''
+  aquarium_id = '' 
+  for result in cursor:
+    tank_name = result['tank_id']
+    aquarium_id = result['aq_id']
+  cursor.close()
+
+  cursor = g.conn.execute("SELECT a.address, a.city, a.state_province, a.country, a.zip FROM aquarium a WHERE a.aq_id = '" + str(aquarium_id) +"'")
+  address = ''
+  city = ''
+  state_province = ''
+  country = ''
+  ZIP = ''
+  for result in cursor:
+    address = result['address']
+    city = result['city']
+    state_province = result['state_province']
+    country = result['country']
+    ZIP = result['zip']
+  aquarium_name = address + ", " + city + ", " + state_province + ", " + country + ", " + str(ZIP)
+  cursor.close()
+
+  context = dict(account_name = account_name, friend_data = friend_names, family_data = family_names, predator_data = predator_names, acquaintance_data =  acquaintance_names, owner_data = owner_names, origin_data = origin_names, prey_data = prey_names, aquarium_data = aquarium_name, tank_data = tank_name)
 
 
   return render_template("fishStuff.html", **context)
