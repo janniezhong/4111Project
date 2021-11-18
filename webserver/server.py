@@ -438,6 +438,73 @@ def view_fish_profile():
 
 
   return render_template("fishStuff.html", **context)
+@app.route('/address_directory', methods=['POST'])
+def view_fish_directory():
+
+  warning_message = ""
+  name = ""
+  street_address = ""
+  city = ""
+  state_province = ""
+  country = ""
+  zip_code = ""
+
+
+  fssn = request.form['fssn']
+  cursor = g.conn.execute("SELECT F.name, A.address, A.city, A.state_province, A.country, A.zip FROM fish F, lives_in L, aquarium A WHERE F.fssn = '" + str(fssn) + "' AND F.fssn = L.fssn AND L.aq_id = A.aq_id")
+  try:
+    name = cursor[0]['name']
+    street_address = cursor[0]['address']
+    city = cursor[0]['city']
+    state_province = cursor[0]['state_province']
+    country = cursor[0]['country']
+    zip_code = cursor[0]['zip']
+  except:
+    warning_message = "not a valid fssn"
+
+  cursor.close()
+  context = dict(warning_message=warning_message, name=name, street_address=street_address, city=city, state_province=state_province, country=country, zip_code=zip_code)
+
+  return render_template("addressDirectory.html", **context)
+
+
+@app.route('/best_owners_in_country', methods=['POST'])
+def view_best_owners_in_country():
+  country = request.form['country']
+  cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O1.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
+  owner_names = []
+  for result in cursor:
+    owner_names.append(result['name'])  # can also be accessed using result[0]
+  cursor.close()
+  context = dict(owner_names=owner_names)
+
+  return render_template("addressDirectory.html", **context)
+
+@app.route('/tanks_in_same_aquarium', methods=['POST'])
+def view_tanks_in_same_aquarium():
+  fssn = request.form['fssn']
+  cursor = g.conn.execute("SELECT DISTINCT L2.tank_id, L2.fish_count, L2.size, L2.rating FROM lives_in L, lives_in L2, fish F WHERE F.fssn = '" + str(fssn) + "' AND F.fssn = L.fssn AND L.aq_id = L2.aq_id")
+  
+  tanks = []
+  for result in cursor:
+    tanks.append(result)  # can also be accessed using result[0]
+  cursor.close()
+  context = dict(tanks=tanks)
+
+  return render_template("tanksInSameAquarium.html", **context)
+
+
+@app.route('/suggested_friends', methods=['POST'])
+def view_suggested_friends():
+    fssn = request.form['fssn']
+    cursor = g.conn.execute("SELECT F2.fssn FROM friend_to F1, friend_to F2 WHERE (F1.fssn = '" + str(fssn) +"' OR F1.fssn_friend = '" + str(fssn) +"') AND F1.fssn = F2.fssn EXCEPT SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
+    suggested_friends = []
+    for result in cursor:
+      suggested_friends.append(result['fssn'])  # can also be accessed using result[0]
+    cursor.close()
+    context = dict(suggested_friends = suggested_friends)
+
+    return render_template("suggestedFriends.html", **context)
 
 @app.route('/login')
 
