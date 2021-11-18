@@ -112,199 +112,394 @@ def index():
   cursor = g.conn.execute("SELECT name FROM test")
   names = []
   for result in cursor:
+
     names.append(result['name'])  # can also be accessed using result[0]
+
   cursor.close()
 
+
+
   #
+
   # Flask uses Jinja templates, which is an extension to HTML where you can
+
   # pass data to a template and dynamically generate HTML based on the data
+
   # (you can think of it as simple PHP)
+
   # documentation: https://realpython.com/primer-on-jinja-templating/
+
   #
+
   # You can see an example template in templates/index.html
+
   #
+
   # context are the variables that are passed to the template.
+
   # for example, "data" key in the context variable defined below will be 
+
   # accessible as a variable in index.html:
+
   #
+
   #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
+
   #     <div>{{data}}</div>
+
   #     
+
   #     # creates a <div> tag for each element in data
+
   #     # will print: 
+
   #     #
+
   #     #   <div>grace hopper</div>
+
   #     #   <div>alan turing</div>
+
   #     #   <div>ada lovelace</div>
+
   #     #
+
   #     {% for n in data %}
+
   #     <div>{{n}}</div>
+
   #     {% endfor %}
+
   #
+
   context = dict(data = names)
 
 
+
+
+
   #
+
   # render_template looks in the templates/ folder for files.
+
   # for example, the below file reads template/index.html
+
   #
+
   return render_template("index.html", **context)
 
+
+
 #
+
 # This is an example of a different path.  You can see it at:
+
 # 
+
 #     localhost:8111/another
+
 #
+
 # Notice that the function name is another() rather than index()
+
 # The functions for each app.route need to have different names
+
 #
+
 @app.route('/fishStuff')
+
 def fishStuff():
+
   fssn = 1
+
   #searching for fish names
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
+
   names = []
+
   for result in cursor:
+
     names.append(result['name'])  # can also be accessed using result[0]
+
   cursor.close()
+
   cursor = g.conn.execute("SELECT fssn FROM fish")
+
   fssn = []
+
   for result in cursor:
+
     fssn.append(result['fssn'])  # can also be accessed using result[0]
+
   cursor.close()
+
   print(fssn)
+
   context = dict(data = names, data2 = fssn)
+
+
+
 
 
   return render_template("fishStuff.html", **context)
 
+
+
 @app.route('/another')
+
 def another():
+
     return render_template("another.html")
 
+
+
 # Example of adding new data to the database
+
 @app.route('/add', methods=['POST'])
+
 def add():
+
   name = request.form['name']
+
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
+
   return redirect('/')
 
 
+
+
+
 @app.route('/add_friend', methods=['POST'])
+
 def add_friend():
+
     fssn = request.form['personal_fssn']
+
     friend_fssn = request.form['friend_fssn']
+
     g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
 
+
+
 @app.route('/view_fish_profile', methods=['POST'])
+
 def view_fish_profile():
+
   fssn =  request.form['name']
 
+
+
   cursor = g.conn.execute("SELECT f.name FROM fish f WHERE f. fssn='" + str(fssn) + "'")
+
   account_name = ''
+
   for result in cursor:
+
     account_name = result['name']
+
   cursor.close()
+
+
 
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
+
   friend_names = []
+
   for result in cursor:
+
     friend_names.append(result['name'])  # can also be accessed using result[0]
+
   cursor.close()
 
+
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, family_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
+
   family_names = []
+
   for result in cursor:
+
     family_names.append(result['name'])  # can also be accessed using result[0]
+
   cursor.close()
-  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
+
   predator_names = []
+
   for result in cursor:
+
     predator_names.append(result['name'])  # can also be accessed using result[0]
+
     cursor.close()
+
   
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_predator = f1.fssn AND f2.fssn = pt.fssn_prey")
+
   prey_names = []
+
   for result in cursor:
+
     prey_names.append(result['name'])  # can also be accessed using result[0]
+
   cursor.close()
+
   
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, acquaintance_to acqt WHERE f1.fssn = '" + str(fssn) +"' AND acqt.fssn = f1.fssn AND f2.fssn = acqt.fssn_acquaintance")
+
   acquaintance_names = []
+
   for result in cursor:
+
     acquaintance_names.append(result['name'])
+
   cursor.close()
+
   
+
   cursor = g.conn.execute("SELECT o.name FROM fish f, owner o, belongs_to bt WHERE f.fssn = '" + str(fssn) +"' AND bt.ssn = o.ssn AND f.fssn = bt.fssn")
+
   owner_names = []
+
   for result in cursor:
+
     owner_names.append(result['name'])
+
   cursor.close()
+
+
+
 
 
   cursor = g.conn.execute("SELECT o.type FROM origin o, fish f WHERE f.fssn = '" + str(fssn) +"' AND o.origin_id = f.origin_id")
+
   origin_names = []
+
   for result in cursor:
+
     origin_names.append(result['type'])
+
   cursor.close()
+
+
+
 
 
   cursor = g.conn.execute("SELECT li.tank_id, li.aq_id FROM lives_in li WHERE li.fssn = '" + str(fssn) +"'")
+
   tank_name = ''
+
   aquarium_id = '' 
+
   for result in cursor:
+
     tank_name = result['tank_id']
+
     aquarium_id = result['aq_id']
+
   cursor.close()
 
+
+
   cursor = g.conn.execute("SELECT a.address, a.city, a.state_province, a.country, a.zip FROM aquarium a WHERE a.aq_id = '" + str(aquarium_id) +"'")
+
   address = ''
+
   city = ''
+
   state_province = ''
+
   country = ''
+
   ZIP = ''
+
   for result in cursor:
+
     address = result['address']
+
     city = result['city']
+
     state_province = result['state_province']
+
     country = result['country']
+
     ZIP = result['zip']
+
   aquarium_name = address + ", " + city + ", " + state_province + ", " + country + ", " + str(ZIP)
+
   cursor.close()
+
+
 
   context = dict(account_name = account_name, friend_data = friend_names, family_data = family_names, predator_data = predator_names, acquaintance_data =  acquaintance_names, owner_data = owner_names, origin_data = origin_names, prey_data = prey_names, aquarium_data = aquarium_name, tank_data = tank_name)
 
 
+
+
+
   return render_template("fishStuff.html", **context)
+
 @app.route('/login')
+
 def login():
+
     abort(401)
+
     this_is_never_executed()
 
 
+
+
+
 if __name__ == "__main__":
+
   import click
 
+
+
   @click.command()
+
   @click.option('--debug', is_flag=True)
+
   @click.option('--threaded', is_flag=True)
+
   @click.argument('HOST', default='0.0.0.0')
+
   @click.argument('PORT', default=8111, type=int)
+
   def run(debug, threaded, host, port):
+
     """
+
     This function handles command line parameters.
+
     Run the server using:
+
+
 
         python3 server.py
 
+
+
     Show the help text using:
+
+
 
         python3 server.py --help
 
+
+
     """
 
+
+
     HOST, PORT = host, port
+
     print("running on %s:%d" % (HOST, PORT))
+
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
+
+
   run()
+

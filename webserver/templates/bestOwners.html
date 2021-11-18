@@ -1,0 +1,29 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>Best owners in selected country:</h1>
+  <div>{{owner_names}}</div>
+
+  <div>
+    {% for n in owner_names %}
+    <div>{{n}}</div>
+    {% endfor %}
+  </div>
+
+  <p><a href="index"> Go back to Home</a></p>
+
+<form method="POST" action="/best_owners_in_country">
+<p>country to search (i.e. Australia): <input type="text" name="country"> <input type="submit" value="Search"></p>
+</form>
+
+</body>
+
+
+</html>

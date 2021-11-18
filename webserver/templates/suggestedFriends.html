@@ -1,0 +1,29 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>Suggested Friends:</h1>
+  <div>{{suggested_friends}}</div>
+
+  <div>
+    {% for n in suggested_friends %}
+    <div>{{n}}</div>
+    {% endfor %}
+  </div>
+
+  <p><a href="index"> Go back to Home</a></p>
+
+<form method="POST" action="/suggested_friends">
+<p>your fssn: <input type="text" name="fssn"> <input type="submit" value="Search"></p>
+</form>
+
+</body>
+
+
+</html>

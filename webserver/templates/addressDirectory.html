@@ -1,0 +1,32 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+
+  <h2>{{warning_message}}</h2>
+  <br>
+  <h2>Name and address of requested fish:</h1>
+  <h3>{{name}}</h3>
+  <h3>{{street_address}}</h3>
+  <h3>{{city}}</h3>
+  <h3>{{state_province}}</h3>
+  <h3>{{country}}</h3>
+  <h3>{{zip_code}}</h3>
+
+<p><a href="index"> Go back to Home</a></p>
+<p><a href="fishStuff">fishStuff</a></p>
+
+<form method="POST" action="/address_directory">
+<p>fssn of fish to search: <input type="text" name="fssn"> <input type="submit" value="Search"></p>
+</form>
+
+</body>
+
+
+</html>

@@ -1,0 +1,42 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>Possible tanks to move to (in your aquarium):</h1>
+  <div>{{tanks}}</div>
+
+  <table>
+    <tr>
+      <th>Tank Id</th>
+      <th>Fish count</th>
+      <th>Size</th>
+      <th>Rating</th>
+    </tr>
+
+    {% for tank in tanks %}
+    <tr>
+      <td>tank['tank_id']</td>
+      <td>tank['fish_count']</td>
+      <td>tank['size']</td>
+      <td>tank['rating']</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  
+  <p><a href="index"> Go back to Home</a></p>
+
+<form method="POST" action="/tanks_in_same_aquarium">
+<p>your fssn: <input type="text" name="fssn"> <input type="submit" value="Search"></p>
+</form>
+
+</body>
+
+
+</html>
