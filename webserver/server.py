@@ -91,101 +91,8 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
-  """
-  request is a special object that Flask provides to access web request information:
-
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments, e.g., {a:1, b:2} for http://localhost?a=1&b=2
-
-  See its API: https://flask.palletsprojects.com/en/2.0.x/api/?highlight=incoming%20request%20data
-
-  """
-
-  # DEBUG: this is debugging code to see what request looks like
-  print(request.args)
-
-
-  #
-  # example of a database query
-  #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-
-    names.append(result['name'])  # can also be accessed using result[0]
-
-  cursor.close()
-
-
-
-  #
-
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-
-  # pass data to a template and dynamically generate HTML based on the data
-
-  # (you can think of it as simple PHP)
-
-  # documentation: https://realpython.com/primer-on-jinja-templating/
-
-  #
-
-  # You can see an example template in templates/index.html
-
-  #
-
-  # context are the variables that are passed to the template.
-
-  # for example, "data" key in the context variable defined below will be 
-
-  # accessible as a variable in index.html:
-
-  #
-
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-
-  #     <div>{{data}}</div>
-
-  #     
-
-  #     # creates a <div> tag for each element in data
-
-  #     # will print: 
-
-  #     #
-
-  #     #   <div>grace hopper</div>
-
-  #     #   <div>alan turing</div>
-
-  #     #   <div>ada lovelace</div>
-
-  #     #
-
-  #     {% for n in data %}
-
-  #     <div>{{n}}</div>
-
-  #     {% endfor %}
-
-  #
-
-  context = dict(data = names)
-
-
-
-
-
-  #
-
-  # render_template looks in the templates/ folder for files.
-
-  # for example, the below file reads template/index.html
-
-  #
-
-  return render_template("index.html", **context)
+  return render_template("index.html")
+@app.route('index')
 
 
 
@@ -204,7 +111,6 @@ def index():
 # The functions for each app.route need to have different names
 
 #
-
 @app.route('/fishStuff')
 
 def fishStuff():
@@ -235,7 +141,7 @@ def fishStuff():
 
   print(fssn)
 
-  context = dict(data = names, data2 = fssn)
+  context = dict(friend_data = names, data2 = fssn)
 
 
 
@@ -438,6 +344,11 @@ def view_fish_profile():
 
 
   return render_template("fishStuff.html", **context)
+
+@app.route('/addressDirectory')
+def addressDirectory():
+  return render_template("addressDirectory.html")
+
 @app.route('/address_directory', methods=['POST'])
 def view_fish_directory():
 
@@ -466,11 +377,14 @@ def view_fish_directory():
 
   return render_template("addressDirectory.html", **context)
 
+@app.route('/bestOwners')
+def bestOwners():
+  return render_template("bestOwners.html")
 
 @app.route('/best_owners_in_country', methods=['POST'])
 def view_best_owners_in_country():
   country = request.form['country']
-  cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O1.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
+  cursor = g.conn.execute("SELECT O.name FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' AND O.rating > (SELECT AVG(O.rating) FROM owner O, belongs_to B, lives_in L, aquarium A WHERE O.ssn = B.ssn AND B.fssn = L.fssn AND L.aq_id = A.aq_id AND A.country = '" + str(country) +"' )")
   owner_names = []
   for result in cursor:
     owner_names.append(result['name'])  # can also be accessed using result[0]
@@ -478,6 +392,10 @@ def view_best_owners_in_country():
   context = dict(owner_names=owner_names)
 
   return render_template("bestOwners.html", **context)
+
+@app.route('/tanksInSameAquarium')
+def tanksInSameAquarium():
+  return render_template("tanksinSameAquarium.html")
 
 @app.route('/tanks_in_same_aquarium', methods=['POST'])
 def view_tanks_in_same_aquarium():
@@ -492,6 +410,9 @@ def view_tanks_in_same_aquarium():
 
   return render_template("tanksInSameAquarium.html", **context)
 
+@app.route('/suggestedFriends')
+def suggestedFriends():
+  return render_template("suggestedFriends.html")
 
 @app.route('/suggested_friends', methods=['POST'])
 def view_suggested_friends():
@@ -504,7 +425,6 @@ def view_suggested_friends():
     context = dict(suggested_friends = suggested_friends)
 
     return render_template("suggestedFriends.html", **context)
-
 @app.route('/login')
 
 def login():
@@ -568,4 +488,3 @@ if __name__ == "__main__":
 
 
   run()
-
