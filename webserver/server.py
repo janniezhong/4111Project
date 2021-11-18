@@ -426,7 +426,7 @@ def suggestedFriends():
 def view_suggested_friends():
     fssn = request.form['fssn']
     try:
-      cursor = g.conn.execute("SELECT F2.fssn_friend FROM friend_to F1, friend_to F2 WHERE F1.fssn = '" + str(fssn) +"' AND F1.fssn_friend = F2.fssn EXCEPT SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
+      cursor = g.conn.execute("SELECT F2.fssn_friend FROM friend_to F1, friend_to F2 WHERE F1.fssn = '" + str(fssn) +"' AND F1.fssn_friend = F2.fssn AND F2.fssn_friend != '" + str(fssn) +"' EXCEPT (SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
     except:
       return render_template("badInput.html")
     
