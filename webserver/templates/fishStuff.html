@@ -8,76 +8,12 @@
 
 
 <body>
-  <div> Welcome to {{account_name}}'s </div>
-  <h1>Friends</h1>
-
-  <div>
-    {% for n in friend_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-  <h1>Family</h1>
-
-  <div>
-    {% for n in family_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-  <h1>Predators</h1>
-
-  <div>
-    {% for n in predator_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-  <h1>Prey</h1>
-
-  <div>
-    {% for n in prey_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-  <h1>Acquaintances</h1>
-
-  <div>
-    {% for n in acquaintance_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-  <h1>Owner</h1>
-
-  <div>
-    {% for n in owner_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-  <h1>origin</h1>
-
-  <div>
-    {% for n in origin_data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
   
-  <h1>Aquarium and Tank of Residence</h1>
-
-  <div>
-	  Tank {{tank_data}}, {{aquarium_data}}
-  </div>
-
   <p><a href="index"> Go back to Home</a></p>
 <form method="POST" action="/view_fish_profile">
 	<p>fssn of friend: <input type="text" name="name"> <input type="submit" value="Search"></p></form>
 
-<form method="POST" action="/add_friend">
-	<p>Your fssn: <input type="text" name="personal_fssn"></p>
-	<p>Friend fssn: <input type = "text" name = "friend_fssn"></p> <p> <input type="submit" value="Friend User"></p>
 
-</form>
 
 </body>
 

@@ -116,39 +116,7 @@ def indexProper():
 
 def fishStuff():
 
-  fssn = 1
-
-  #searching for fish names
-
-  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
-
-  names = []
-
-  for result in cursor:
-
-    names.append(result['name'])  # can also be accessed using result[0]
-
-  cursor.close()
-
-  cursor = g.conn.execute("SELECT fssn FROM fish")
-
-  fssn = []
-
-  for result in cursor:
-
-    fssn.append(result['fssn'])  # can also be accessed using result[0]
-
-  cursor.close()
-
-  print(fssn)
-
-  context = dict(friend_data = names, data2 = fssn)
-
-
-
-
-
-  return render_template("fishStuff.html", **context)
+  return render_template("fishStuff.html", )
 
 
 
@@ -351,7 +319,7 @@ def view_fish_profile():
 
 
 
-  return render_template("fishStuff.html", **context)
+  return render_template("fishInfo.html", **context)
 
 @app.route('/addressDirectory')
 def addressDirectory():
