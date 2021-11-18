@@ -92,8 +92,9 @@ def teardown_request(exception):
 @app.route('/')
 def index():
   return render_template("index.html")
-@app.route('index')
-
+@app.route('/index')
+def indexProper():
+  return render_template("index.html")
 
 
 #
@@ -115,39 +116,7 @@ def index():
 
 def fishStuff():
 
-  fssn = 1
-
-  #searching for fish names
-
-  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
-
-  names = []
-
-  for result in cursor:
-
-    names.append(result['name'])  # can also be accessed using result[0]
-
-  cursor.close()
-
-  cursor = g.conn.execute("SELECT fssn FROM fish")
-
-  fssn = []
-
-  for result in cursor:
-
-    fssn.append(result['fssn'])  # can also be accessed using result[0]
-
-  cursor.close()
-
-  print(fssn)
-
-  context = dict(friend_data = names, data2 = fssn)
-
-
-
-
-
-  return render_template("fishStuff.html", **context)
+  return render_template("fishStuff.html", )
 
 
 
@@ -182,29 +151,33 @@ def add_friend():
     fssn = request.form['personal_fssn']
 
     friend_fssn = request.form['friend_fssn']
-
-    g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
+    try:
+      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
+    except: 
+      context = dict(friending_message = "Improper message")
+      return render_template("suggestedFriends.html", **context)
+    context = dict(friending_message = "successfully friended!")
+    return render_template("suggestedFriends.html", **context)
 
 
 
 @app.route('/view_fish_profile', methods=['POST'])
 
 def view_fish_profile():
-
   fssn =  request.form['name']
 
 
-
-  cursor = g.conn.execute("SELECT f.name FROM fish f WHERE f. fssn='" + str(fssn) + "'")
-
+  try:
+    cursor = g.conn.execute("SELECT f.name FROM fish f WHERE f. fssn='" + str(fssn) + "'")
+  except:
+    return render_template('badInput.html')
   account_name = ''
-
+  
   for result in cursor:
 
     account_name = result['name']
 
   cursor.close()
-
 
 
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
@@ -218,7 +191,6 @@ def view_fish_profile():
   cursor.close()
 
 
-
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, family_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
 
   family_names = []
@@ -230,12 +202,14 @@ def view_fish_profile():
   cursor.close()
 
   predator_names = []
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
 
   for result in cursor:
 
     predator_names.append(result['name'])  # can also be accessed using result[0]
 
     cursor.close()
+    
 
   
 
@@ -261,7 +235,6 @@ def view_fish_profile():
 
   cursor.close()
 
-  
 
   cursor = g.conn.execute("SELECT o.name FROM fish f, owner o, belongs_to bt WHERE f.fssn = '" + str(fssn) +"' AND bt.ssn = o.ssn AND f.fssn = bt.fssn")
 
@@ -272,6 +245,7 @@ def view_fish_profile():
     owner_names.append(result['name'])
 
   cursor.close()
+  
 
 
 
@@ -304,7 +278,6 @@ def view_fish_profile():
     aquarium_id = result['aq_id']
 
   cursor.close()
-
 
 
   cursor = g.conn.execute("SELECT a.address, a.city, a.state_province, a.country, a.zip FROM aquarium a WHERE a.aq_id = '" + str(aquarium_id) +"'")
@@ -342,8 +315,7 @@ def view_fish_profile():
 
 
 
-
-  return render_template("fishStuff.html", **context)
+  return render_template("fishInfo.html", **context)
 
 @app.route('/addressDirectory')
 def addressDirectory():
@@ -431,10 +403,9 @@ def view_suggested_friends():
       return render_template("badInput.html")
     
     suggested_friends = []
+    
     for result in cursor:
       suggested_friends.append(result['fssn_friend'])  # can also be accessed using result[0]
-    except:
-      return render_template("badInput.html")
     cursor.close()
     context = dict(suggested_friends = suggested_friends)
 
