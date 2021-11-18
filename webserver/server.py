@@ -410,16 +410,6 @@ def view_suggested_friends():
     context = dict(suggested_friends = suggested_friends)
 
     return render_template("suggestedFriends.html", **context)
-@app.route('/login')
-
-def login():
-
-    abort(401)
-
-    this_is_never_executed()
-
-
-
 
 
 if __name__ == "__main__":
