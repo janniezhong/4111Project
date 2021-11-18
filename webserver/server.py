@@ -457,15 +457,14 @@ def view_fish_directory():
 
   fssn = request.form['fssn']
   cursor = g.conn.execute("SELECT F.name, A.address, A.city, A.state_province, A.country, A.zip FROM fish F, lives_in L, aquarium A WHERE F.fssn = '" + str(fssn) + "' AND F.fssn = L.fssn AND L.aq_id = A.aq_id")
-  try:
-    name = cursor[0]['name']
-    street_address = cursor[0]['address']
-    city = cursor[0]['city']
-    state_province = cursor[0]['state_province']
-    country = cursor[0]['country']
-    zip_code = cursor[0]['zip']
-  except:
-    warning_message = "not a valid fssn"
+
+  for result in cursor:
+    name = result['name']
+    street_address = result['address']
+    city = result['city']
+    state_province = result['state_province']
+    country = result['country']
+    zip_code = result['zip']
 
   cursor.close()
   context = dict(warning_message=warning_message, name=name, street_address=street_address, city=city, state_province=state_province, country=country, zip_code=zip_code)
@@ -486,7 +485,7 @@ def view_best_owners_in_country():
   cursor.close()
   context = dict(owner_names=owner_names)
 
-  return render_template("addressDirectory.html", **context)
+  return render_template("bestOwners.html", **context)
 
 @app.route('/tanksInSameAquarium')
 def tanksInSameAquarium():
@@ -495,11 +494,11 @@ def tanksInSameAquarium():
 @app.route('/tanks_in_same_aquarium', methods=['POST'])
 def view_tanks_in_same_aquarium():
   fssn = request.form['fssn']
-  cursor = g.conn.execute("SELECT DISTINCT L2.tank_id, L2.fish_count, L2.size, L2.rating FROM lives_in L, lives_in L2, fish F WHERE F.fssn = '" + str(fssn) + "' AND F.fssn = L.fssn AND L.aq_id = L2.aq_id")
+  cursor = g.conn.execute("SELECT DISTINCT T.tank_id, T.fish_count, T.size, T.rating FROM lives_in L, tank_exists_in T, fish F WHERE F.fssn = '" + str(fssn) + "' AND F.fssn = L.fssn AND L.aq_id = T.aq_id")
   
   tanks = []
   for result in cursor:
-    tanks.append(result)  # can also be accessed using result[0]
+    tanks.append(result)
   cursor.close()
   context = dict(tanks=tanks)
 
