@@ -364,7 +364,7 @@ def view_best_owners_in_country():
 
 @app.route('/tanksInSameAquarium')
 def tanksInSameAquarium():
-  return render_template("tanksinSameAquarium.html")
+  return render_template("tanksInSameAquarium.html")
 
 @app.route('/tanks_in_same_aquarium', methods=['POST'])
 def view_tanks_in_same_aquarium():
