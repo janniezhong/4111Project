@@ -128,20 +128,6 @@ def another():
 
 
 
-# Example of adding new data to the database
-
-@app.route('/add', methods=['POST'])
-
-def add():
-
-  name = request.form['name']
-
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-
-  return redirect('/')
-
-
-
 
 
 @app.route('/add_friend', methods=['POST'])
@@ -152,7 +138,7 @@ def add_friend():
 
     friend_fssn = request.form['friend_fssn']
     try:
-      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
+      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES ('%s', '%s'), ('%s', '%s')", fssn, friend_fssn, friend_fssn, fssn)
     except: 
       context = dict(friending_message = "Improper message")
       return render_template("suggestedFriends.html", **context)
