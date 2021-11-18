@@ -128,20 +128,6 @@ def another():
 
 
 
-# Example of adding new data to the database
-
-@app.route('/add', methods=['POST'])
-
-def add():
-
-  name = request.form['name']
-
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-
-  return redirect('/')
-
-
-
 
 
 @app.route('/add_friend', methods=['POST'])
@@ -152,7 +138,7 @@ def add_friend():
 
     friend_fssn = request.form['friend_fssn']
     try:
-      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES (%s, %s), (%s, %s)", fssn, friend_fssn, friend_fssn, fssn)
+      g.conn.execute("INSERT INTO friend_to(fssn, fssn_friend) VALUES ('%s', '%s'), ('%s', '%s')", fssn, friend_fssn, friend_fssn, fssn)
     except: 
       context = dict(friending_message = "Improper message")
       return render_template("suggestedFriends.html", **context)
@@ -202,13 +188,14 @@ def view_fish_profile():
   cursor.close()
 
   predator_names = []
+
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
 
   for result in cursor:
 
     predator_names.append(result['name'])  # can also be accessed using result[0]
 
-    cursor.close()
+  cursor.close()
     
 
   
@@ -317,6 +304,10 @@ def view_fish_profile():
 
   return render_template("fishInfo.html", **context)
 
+@app.route('/fishInfo')
+def fishInfo():
+  render_template("fishInfo.html")
+  
 @app.route('/addressDirectory')
 def addressDirectory():
   return render_template("addressDirectory.html")
@@ -410,16 +401,6 @@ def view_suggested_friends():
     context = dict(suggested_friends = suggested_friends)
 
     return render_template("suggestedFriends.html", **context)
-@app.route('/login')
-
-def login():
-
-    abort(401)
-
-    this_is_never_executed()
-
-
-
 
 
 if __name__ == "__main__":
