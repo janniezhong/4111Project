@@ -177,11 +177,7 @@ def fishStuff():
 
 
   return render_template("fishStuff.html", **context)
-
-@app.route('/another')
-def another():
-    return render_template("another.html")
-
+  
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
