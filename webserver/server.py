@@ -425,7 +425,7 @@ def suggestedFriends():
 @app.route('/suggested_friends', methods=['POST'])
 def view_suggested_friends():
     fssn = request.form['fssn']
-    cursor = g.conn.execute("SELECT F2.fssn FROM friend_to F1, friend_to F2 WHERE (F1.fssn = '" + str(fssn) +"' OR F1.fssn_friend = '" + str(fssn) +"') AND F1.fssn = F2.fssn EXCEPT SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
+    cursor = g.conn.execute("SELECT F2.fssn_friend FROM friend_to F1, friend_to F2 WHERE F1.fssn = '" + str(fssn) +"' AND F1.fssn_friend = F2.fssn EXCEPT SELECT F1.fssn_friend FROM friend_to F1 WHERE F1.fssn = '" + str(fssn) +"'")
     suggested_friends = []
     for result in cursor:
       suggested_friends.append(result['fssn'])  # can also be accessed using result[0]
