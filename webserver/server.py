@@ -92,8 +92,9 @@ def teardown_request(exception):
 @app.route('/')
 def index():
   return render_template("index.html")
-@app.route('index')
-
+@app.route('/index')
+def indexProper():
+  return render_template("index.html")
 
 
 #
@@ -194,9 +195,9 @@ def view_fish_profile():
   fssn =  request.form['name']
 
 
-
+  print('hate')
   cursor = g.conn.execute("SELECT f.name FROM fish f WHERE f. fssn='" + str(fssn) + "'")
-
+  print('everything about this')
   account_name = ''
 
   for result in cursor:
@@ -205,7 +206,7 @@ def view_fish_profile():
 
   cursor.close()
 
-
+  print('huh??')
 
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, friend_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_friend")
 
@@ -218,7 +219,7 @@ def view_fish_profile():
   cursor.close()
 
 
-
+  print('at family names')
   cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, family_to ft WHERE f1.fssn = '" + str(fssn) +"' AND ft.fssn = f1.fssn AND f2.fssn = ft.fssn_family")
 
   family_names = []
@@ -228,14 +229,18 @@ def view_fish_profile():
     family_names.append(result['name'])  # can also be accessed using result[0]
 
   cursor.close()
+  print('at predator names')
 
   predator_names = []
+  cursor = g.conn.execute("SELECT f2.name FROM fish f1, fish f2, eaten_by pt WHERE f1.fssn = '" + str(fssn) +"' AND pt.fssn_prey = f1.fssn AND f2.fssn = pt.fssn_predator")
 
   for result in cursor:
 
     predator_names.append(result['name'])  # can also be accessed using result[0]
 
     cursor.close()
+    
+  print('at prey names')
 
   
 
@@ -248,6 +253,7 @@ def view_fish_profile():
     prey_names.append(result['name'])  # can also be accessed using result[0]
 
   cursor.close()
+  print('at acquaintance')
 
   
 
@@ -261,7 +267,7 @@ def view_fish_profile():
 
   cursor.close()
 
-  
+  print('at owner names')
 
   cursor = g.conn.execute("SELECT o.name FROM fish f, owner o, belongs_to bt WHERE f.fssn = '" + str(fssn) +"' AND bt.ssn = o.ssn AND f.fssn = bt.fssn")
 
@@ -272,6 +278,8 @@ def view_fish_profile():
     owner_names.append(result['name'])
 
   cursor.close()
+  
+  print('origin names')
 
 
 
@@ -305,7 +313,7 @@ def view_fish_profile():
 
   cursor.close()
 
-
+  print('at address')
 
   cursor = g.conn.execute("SELECT a.address, a.city, a.state_province, a.country, a.zip FROM aquarium a WHERE a.aq_id = '" + str(aquarium_id) +"'")
 
@@ -339,7 +347,7 @@ def view_fish_profile():
 
   context = dict(account_name = account_name, friend_data = friend_names, family_data = family_names, predator_data = predator_names, acquaintance_data =  acquaintance_names, owner_data = owner_names, origin_data = origin_names, prey_data = prey_names, aquarium_data = aquarium_name, tank_data = tank_name)
 
-
+  print('strying strong')
 
 
 
